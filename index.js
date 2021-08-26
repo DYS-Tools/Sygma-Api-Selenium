@@ -19,53 +19,53 @@ firefox = require('selenium-webdriver/firefox');
 var path = require('chromedriver').path;
  
 //available on https://www.marinetraffic.com/en/ais/details/ships/shipid:5941181/mmsi:227914510/imo:0/vessel:HERMIONE
-async function getShipPosition(url){
+async function getCompany(url){
 
 		// set driver   TODO: --disable-web-security
 		
-		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', '--headless', '--disable-dev-shm-usage', '--disable-gpu', '--disable-extensions',
+		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', /*'--headless', '--disable-dev-shm-usage',*/ '--disable-gpu', '--disable-extensions',
 		'excludeSwitches', 'enable-logging', '--ignore-ssl-errors', '--ignore-certificate-error', '--start-maximized', '--enable-automation',
-		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False' ]), new 
+		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False', '--disable-software-rasterizer']), new 
 		chrome.ServiceBuilder(path).build());
-		driver.manage().timeouts().implicitlyWait(15000);
+		driver.manage().timeouts().implicitlyWait(2000000);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
 		await driver.get(url);
+		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click();
 
-		try {
-			await driver.findElement(By.xpath("/html/body/div/div/div/div/div[2]/div/button[2]")).click();
-		}
-		catch(error){
-    	console.error(error);
-		}
+		let elements = await driver.findElements(By.xpath('//a'));
+		console.log(elements);
+		//for(let e in elements) {
 
-		// find position
-		const position = await driver.findElement(By.xpath("/html/body/main/div/div/div[3]/div[2]/div/div/div[3]/div/div[1]/span/div/div[2]/div/div/div/div/div[1]/p[5]/b/a")).getText();
+				//await e.getAttributes('href').click();
+				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a')).click(); // click on first element
+				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
+				return companyTitle;
+		//}
+
 		driver.quit();
-		return position;
-
+		return data;
   }
 	  
-app.get('/getShipPosition/:ship', async (req, res) => {
-	ship = req.params.ship;
+/* Find Company on google Maps */
+app.get('/getCompany/:searchWord', async (req, res) => {
+	let searchWord = req.params.searchWord;
 
-	var shipArray = { 
-		"HERMIONE" : 'https://www.marinetraffic.com/en/ais/details/ships/shipid:180670/mmsi:228052600/imo:0/vessel:LHERMIONE',
-	  "BELEM" : 'https://www.marinetraffic.com/en/ais/details/ships/shipid:173170/mmsi:227051000/imo:8622983/vessel:BELEM',
-	};
+	let url = 'https://www.google.fr/maps/search/'+searchWord+'/@49.6192493,0.257829,12z/';
+	let companies = await getCompany(url);
 
-	console.log(shipArray[ship]);
-
-	let position = await getShipPosition(shipArray[ship]);
+	console.log(companies);
   
-    //res.set('Content-Type', 'text/html');
-  return res.send(position);
+  res.set('Content-Type', 'text/html');
+  return res.send(companies);
 });
+
+
 
 app.get('/', (req, res) => {
   
     res.set('Content-Type', 'text/html');
-    res.send('API on /getShipPosition/:ship');
+    res.send('API on /getCompany/:searchWord (searching in google maps)');
 });
 
 app.listen(port, () => {
