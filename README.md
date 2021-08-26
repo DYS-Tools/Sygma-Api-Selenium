@@ -11,7 +11,7 @@ this part is a lead selenium extractor engine from googleMaps
 	
 #### production 
 
-- use pm2 for containerize app
+use pm2 for containerize app
 
 	git clone 
 	pm2 start index.js -n armada-gps -- --port 2500
