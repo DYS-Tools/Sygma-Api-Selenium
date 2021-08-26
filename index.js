@@ -30,21 +30,35 @@ async function getCompany(url){
 		driver.manage().timeouts().implicitlyWait(2000000);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
+		let companies = [];
 		await driver.get(url);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click();
 
 		let elements = await driver.findElements(By.xpath('//a'));
-		console.log(elements);
-		//for(let e in elements) {
+		console.log(elements.length);
 
-				//await e.getAttributes('href').click();
-				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a')).click(); // click on first element
+
+		//for(let e in elements) {
+				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a')).click(); // click on one company
+
 				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
-				return companyTitle;
+				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
+				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
+				let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
+				let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
+
+				/****  TESTING XPATH FOR CHOOSE ONE COMPANY  ****/
+				// xpath first element :  /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a
+				// xpath second element : /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[3]/div/a
+				// third element :        /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[5]/div/a
 		//}
 
-		driver.quit();
-		return data;
+		//driver.back()
+
+		let company = [companyTitle, phone, website, mail, adresse];
+		companies.push(company);
+		//driver.quit();
+		return companies;
   }
 	  
 /* Find Company on google Maps */
