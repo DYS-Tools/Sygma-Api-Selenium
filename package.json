@@ -1,0 +1,17 @@
+{
+  "name": "akarah-scraping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "SachaDurand <sacha6623@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "chromedriver": "latest",
+    "express": "^4.17.1",
+    "selenium-webdriver": "3.6.0"
+  }
+}
