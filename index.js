@@ -2,12 +2,6 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3456;
 
-/*
-require('chromedriver');
-const chrome = require ('selenium-webdriver/chrome');
-const {Builder, By, Key, until} = require ('selenium-webdriver');
-*/
-
 // options : https://stackoverflow.com/questions/63466426/handshake-failed-returned-1-ssl-error-code-1-net-error-201 
 
 webdriver = require('selenium-webdriver'),
@@ -17,17 +11,15 @@ Builder = webdriver.Builder,
 chrome = require('selenium-webdriver/chrome'),
 firefox = require('selenium-webdriver/firefox');
 var path = require('chromedriver').path;
- 
-//available on https://www.marinetraffic.com/en/ais/details/ships/shipid:5941181/mmsi:227914510/imo:0/vessel:HERMIONE
-async function getCompany(url){
 
-		// set driver   TODO: --disable-web-security
+async function getCompany(url){
 		
 		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', /*'--headless', */ '--disable-dev-shm-usage', '--disable-gpu', '--disable-extensions',
 		'excludeSwitches', 'enable-logging', '--ignore-ssl-errors', '--ignore-certificate-error', '--start-maximized','--enable-automation', 
-		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False', '--disable-software-rasterizer']), new 
+		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False', '--disable-software-rasterizer', '--disable-web-security']), new 
 		chrome.ServiceBuilder(path).build());
-		driver.manage().timeouts().implicitlyWait(200000000);
+		//driver.manage().waitForPageToLoad(30000);
+		driver.manage().timeouts().implicitlyWait(50000000000);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
 		let companies = [];
@@ -40,37 +32,45 @@ async function getCompany(url){
 		if(maxResultForPage > 0){
 			for (let currentCompany = 1; currentCompany < maxResultForPage ; currentCompany = currentCompany + 2) {
 				  try{
-						driver.sleep(800);
-						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click();
+
+						// SELECT COMPANY IN LIST
+						driver.sleep(400);
+					  //	await driver.switchTo().defaultContent();
+						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
+
+						// GET ELEMENTS ON COMPANY PAGE
 						let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
 						let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
 						let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
 						let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
 						let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
 
-						let company = [companyTitle, phone, website, mail, adresse];
+						// CONSTRUCT COMPANY OBJECT
+						company = [];
+						if(companyTitle !== null){company.push(companyTitle);}
+						if(phone !== null){company.push(phone);}
+						if(website!== null){company.push(website);}
+						if(mail !== null){company.push(mail);}
+						if(adresse!== null ){company.push(adresse);}
 						companies.push(company);
+
 						console.log(company);
-						//driver.quit();
-						await driver.navigate().back();
-					} catch(e){}
+						//driver.quit(); 
+
+						driver.sleep(400);
+						
+					} catch(e){ }
 
 					try{
+						driver.navigate().back();
 						await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
-					}catch(e){}
+					} catch(e){ }
+
+					//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();  // back to list
+
 			}
 			return companies;
 		}
-
-		//if /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2] == 20
-		
-		await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a')).click(); // click on one company
-
-		let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
-		let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
-		let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
-		let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
-		let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
 
 		/****  TESTING XPATH FOR CHOOSE ONE COMPANY  ****/
 		// xpath first element :  /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a
@@ -79,13 +79,7 @@ async function getCompany(url){
 		// 20eme element :        /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[39]/div/a
 		// maxResultForPage : 		/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]         // 20 ?
 		// nextPageButton :       /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]/img
-
-		//driver.back()
-
-		let company = [companyTitle, phone, website, mail, adresse];
-		companies.push(company);
-		//driver.quit();
-		return companies;
+		// back to list button :  /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span
   }
 	  
 /* Find Company on google Maps */
