@@ -26,6 +26,7 @@ async function getCompany(url){
 		await driver.get(url);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
+		driver.sleep(1500);
 		let maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText(); // 20 ? 
 		console.log(maxResultForPage);
 
@@ -51,23 +52,27 @@ async function getCompany(url){
 						if(phone !== null){company.push(phone);}
 						if(website!== null){company.push(website);}
 						if(mail !== null){company.push(mail);}
-						if(adresse!== null ){company.push(adresse);}
-						companies.push(company);
-
+						if(adresse !== null ){company.push(adresse);}
+						if(company!== null ){
+							companies.push(company);
+						}
 						console.log(company);
 						//driver.quit(); 
 
 						driver.sleep(400);
 						
 					} catch(e){ }
-
-					try{
+					
+					//TODO: include logs for debugging back navigation
+					if(company.lenght > 0){
 						driver.navigate().back();
-						await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
-					} catch(e){ }
+						driver.sleep(900);
+						await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button')).click(); // pass RGPD page
+						driver.sleep(900);
+					}
+
 
 					//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();  // back to list
-
 			}
 			return companies;
 		}
@@ -78,7 +83,7 @@ async function getCompany(url){
 		// third element :        /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[5]/div/a
 		// 20eme element :        /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[39]/div/a
 		// maxResultForPage : 		/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]         // 20 ?
-		// nextPageButton :       /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]/img
+		// nextPageButton :       /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]
 		// back to list button :  /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span
   }
 	  
