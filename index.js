@@ -8,9 +8,14 @@ webdriver = require('selenium-webdriver'),
 By = webdriver.By,
 until = webdriver.until,
 Builder = webdriver.Builder,
+Capabilities = webdriver.Capabilities,
 chrome = require('selenium-webdriver/chrome'),
 firefox = require('selenium-webdriver/firefox');
 var path = require('chromedriver').path;
+
+//const caps = new Capabilities();
+//caps.setPageLoadStrategy("eager");
+
 
 async function getCompany(url){
 		
@@ -26,19 +31,26 @@ async function getCompany(url){
 		await driver.get(url);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
-		driver.sleep(1000);
+		driver.sleep(1600);
 		let maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText(); // 20 ? 
 		console.log(maxResultForPage);
 
 		if(maxResultForPage > 0){
-			for (let currentCompany = 1; currentCompany < maxResultForPage ; currentCompany = currentCompany = currentCompany + 2) {
+			for (let currentCompany = 1; currentCompany < maxResultForPage * 2 ; currentCompany = currentCompany = currentCompany + 2) {
+
+				// SCROLL 
+				driver.sleep(400);
+				console.log('selection element');
+				//view : /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div
+				let element = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]'));
+				await driver.executeScript("arguments[0].scrollIntoView(true);", element);
 
 				// SELECT COMPANY IN LIST
-				driver.sleep(400);
-				//	await driver.switchTo().defaultContent();
+				driver.sleep(100);
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
 
 				// GET ELEMENTS ON COMPANY PAGE
+				console.log('GET company');
 				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
 				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
 				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
@@ -60,6 +72,8 @@ async function getCompany(url){
 
 				driver.sleep(400);
 					
+
+				console.log('Navigation Back');
 
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click();
 				//driver.navigate().back();
