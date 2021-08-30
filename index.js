@@ -26,53 +26,49 @@ async function getCompany(url){
 		await driver.get(url);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
-		driver.sleep(1500);
+		driver.sleep(1000);
 		let maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText(); // 20 ? 
 		console.log(maxResultForPage);
 
 		if(maxResultForPage > 0){
-			for (let currentCompany = 1; currentCompany < maxResultForPage ; currentCompany = currentCompany + 2) {
-				  try{
+			for (let currentCompany = 1; currentCompany < maxResultForPage ; currentCompany = currentCompany = currentCompany + 2) {
 
-						// SELECT COMPANY IN LIST
-						driver.sleep(400);
-					  //	await driver.switchTo().defaultContent();
-						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
+				// SELECT COMPANY IN LIST
+				driver.sleep(400);
+				//	await driver.switchTo().defaultContent();
+				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
 
-						// GET ELEMENTS ON COMPANY PAGE
-						let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
-						let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
-						let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
-						let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
-						let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
+				// GET ELEMENTS ON COMPANY PAGE
+				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
+				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
+				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
+				let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
+				let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
 
-						// CONSTRUCT COMPANY OBJECT
-						company = [];
-						if(companyTitle !== null){company.push(companyTitle);}
-						if(phone !== null){company.push(phone);}
-						if(website!== null){company.push(website);}
-						if(mail !== null){company.push(mail);}
-						if(adresse !== null ){company.push(adresse);}
-						if(company!== null ){
-							companies.push(company);
-						}
-						console.log(company);
-						//driver.quit(); 
+				// CONSTRUCT COMPANY OBJECT
+				company = [];
+				if(companyTitle !== null){company.push(companyTitle);}
+				if(phone !== null){company.push(phone);}
+				if(website!== null){company.push(website);}
+				if(mail !== null){company.push(mail);}
+				if(adresse !== null ){company.push(adresse);}
+				if(company!== null ){
+					companies.push(company);
+				}
+				console.log(company);
+				//driver.quit(); 
 
-						driver.sleep(400);
-						
-					} catch(e){ }
+				driver.sleep(400);
 					
-					//TODO: include logs for debugging back navigation
-					if(company.lenght > 0){
-						driver.navigate().back();
-						driver.sleep(900);
-						await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button')).click(); // pass RGPD page
-						driver.sleep(900);
-					}
+
+				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click();
+				//driver.navigate().back();
+				driver.sleep(800);
+				//await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button')).click(); // pass RGPD page
+				//driver.sleep(800);
 
 
-					//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();  // back to list
+				//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();  // back to list
 			}
 			return companies;
 		}
@@ -85,6 +81,7 @@ async function getCompany(url){
 		// maxResultForPage : 		/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]         // 20 ?
 		// nextPageButton :       /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]
 		// back to list button :  /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span
+		// rollback button in menu: /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button  
   }
 	  
 /* Find Company on google Maps */
