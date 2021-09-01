@@ -49,22 +49,27 @@ async function getCompanies(url){
 				if(currentCompany > 9){scrollValue = 2000;}
 				if(currentCompany > 12){scrollValue = 2300;}
 				if(currentCompany > 18){scrollValue = 5500;}
-
 				driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
 				
 				// SELECT COMPANY IN LIST
-				driver.sleep(1500);
+				driver.sleep(1900);
 				console.log('selection element');
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
+				driver.sleep(700);
+
 
 				// GET ELEMENTS ON COMPANY PAGE
 				console.log('GET company');
 				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
-				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[4]/button/div[1]/div[2]/div[1]')).getText();
-				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getText();
+				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getAttribute('aria-label');
+				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button')).getAttribute('aria-label');
+				let adresse = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]')).getText();
 				let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
-				let adresse = await driver.findElement((By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]'))).getText();
 
+				driver.sleep(1000);
+				//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
+
+				console.log('construct object');
 				// CONSTRUCT COMPANY OBJECT
 				company = [];
 				if(companyTitle !== null){company.push(companyTitle);}
@@ -78,6 +83,7 @@ async function getCompanies(url){
 				}
 				console.log(company);
 				console.log(companyNumber);
+				
 
 				driver.sleep(400);
 					
@@ -98,7 +104,7 @@ async function getCompanies(url){
 					driver.sleep(1300);
 					maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
 					currentCompany = 1;
-					driver.sleep(1300);
+					driver.sleep(2500);
 				}
 
 				
