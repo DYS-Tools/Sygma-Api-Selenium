@@ -17,36 +17,44 @@ var path = require('chromedriver').path;
 //caps.setPageLoadStrategy("eager");
 
 
-async function getCompany(url){
+async function getCompanies(url){
+		
+		let companyNumber = 0;
 		
 		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', /*'--headless', */ '--disable-dev-shm-usage', '--disable-gpu', '--disable-extensions',
 		'excludeSwitches', 'enable-logging', '--ignore-ssl-errors', '--ignore-certificate-error', '--start-maximized','--enable-automation', 
 		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False', '--disable-software-rasterizer', '--disable-web-security']), new 
 		chrome.ServiceBuilder(path).build());
 		//driver.manage().waitForPageToLoad(30000);
-		driver.manage().timeouts().implicitlyWait(50000000000);
+		driver.manage().timeouts().implicitlyWait(50000000);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
 		let companies = [];
 		await driver.get(url);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
-		driver.sleep(1600);
+		driver.sleep(1700);
 		let maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText(); // 20 ? 
 		console.log(maxResultForPage);
 
 		if(maxResultForPage > 0){
 			for (let currentCompany = 1; currentCompany < maxResultForPage * 2 ; currentCompany = currentCompany = currentCompany + 2) {
+				driver.sleep(1600);
 
 				// SCROLL 
-				driver.sleep(400);
-				console.log('selection element');
-				//view : /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div
-				let element = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]'));
-				await driver.executeScript("arguments[0].scrollIntoView(true);", element);
+				console.log('scroll');
+				let scrollValue = 900;
+				//if(currentCompany > 5){ scrollValue = 1200;}
+				if(currentCompany > 7){ scrollValue = 1300;}
+				if(currentCompany > 9){scrollValue = 2000;}
+				if(currentCompany > 12){scrollValue = 2300;}
+				if(currentCompany > 18){scrollValue = 5500;}
 
+				driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
+				
 				// SELECT COMPANY IN LIST
-				driver.sleep(100);
+				driver.sleep(1500);
+				console.log('selection element');
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
 
 				// GET ELEMENTS ON COMPANY PAGE
@@ -66,26 +74,38 @@ async function getCompany(url){
 				if(adresse !== null ){company.push(adresse);}
 				if(company!== null ){
 					companies.push(company);
+					companyNumber++;
 				}
 				console.log(company);
-				//driver.quit(); 
+				console.log(companyNumber);
 
 				driver.sleep(400);
 					
-
 				console.log('Navigation Back');
-
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click();
-				//driver.navigate().back();
-				driver.sleep(800);
-				//await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button')).click(); // pass RGPD page
-				//driver.sleep(800);
+				driver.sleep(1200);
 
+				//RESULT HANDLER
+				if(companyNumber >= 25){
+					currentCompany = 100000;
+				}
 
-				//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();  // back to list
+				//PAGE HANDLER
+				console.log('currentCompany var:' + currentCompany);
+				if(currentCompany >= 17 && currentCompany < 99999){
+					console.log('nextPAGE');
+					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]')).click(); // next page
+					driver.sleep(1300);
+					maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
+					currentCompany = 1;
+					driver.sleep(1300);
+				}
+
+				
 			}
-			return companies;
 		}
+			return companies;
+	}
 
 		/****  TESTING XPATH FOR CHOOSE ONE COMPANY  ****/
 		// xpath first element :  /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div[1]/div/a
@@ -95,15 +115,16 @@ async function getCompany(url){
 		// maxResultForPage : 		/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]         // 20 ?
 		// nextPageButton :       /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]
 		// back to list button :  /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span
-		// rollback button in menu: /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button  
-  }
+		// rollback button in menu: /html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button 
+		// scrollView XPATH =     /html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1] 
+
 	  
 /* Find Company on google Maps */
 app.get('/getCompany/:searchWord', async (req, res) => {
-	let searchWord = req.params.searchWord;
 
+	let searchWord = req.params.searchWord;
 	let url = 'https://www.google.fr/maps/search/'+searchWord+'/@49.6192493,0.257829,12z/';
-	let companies = await getCompany(url);
+	let companies = await getCompanies(url);
 
 	console.log(companies);
   
