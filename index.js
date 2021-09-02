@@ -30,7 +30,7 @@ async function getCompanies(url){
 		chrome.ServiceBuilder().build());
 
 		//driver.manage().waitForPageToLoad(30000);
-		driver.manage().timeouts().implicitlyWait(50000000);
+		driver.manage().timeouts().implicitlyWait(25);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
 		let companies = [];
@@ -64,11 +64,26 @@ async function getCompanies(url){
 
 
 				// GET ELEMENTS ON COMPANY PAGE
-				console.log('GET company');
-				let companyTitle = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[2]/div[1]/div[1]/div[1]/h1/span[1]')).getText();
-				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getAttribute('aria-label');
-				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button')).getAttribute('aria-label');
-				let adresse = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]')).getText();
+				//let ShopSection = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[6]/button/div/div[1]/div[2]/div[1]/div[2]')).getText();
+				//console.log(ShopSection);
+				//if(ShopSection.indexOf("Magasin") == -1){ // Verify if company page is scrappable
+
+					console.log('GET company');
+					var companyTitle =  await driver.findElement(By.xpath("//div[@role='main' and @aria-label]"))//.get_attribute('aria-label')
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  console.log('error : '+err); });
+
+					var phone =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Numéro de téléphone:')]"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  console.log('error : '+err); });
+					var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  console.log('error : '+err); });
+
+					var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  console.log('error : '+err); });
+				//}
 
 				/*
 				if(website != null){
