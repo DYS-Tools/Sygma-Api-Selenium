@@ -64,45 +64,47 @@ async function getCompanies(url){
 
 
 				// GET ELEMENTS ON COMPANY PAGE
-				//let ShopSection = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[6]/button/div/div[1]/div[2]/div[1]/div[2]')).getText();
-				//console.log(ShopSection);
-				//if(ShopSection.indexOf("Magasin") == -1){ // Verify if company page is scrappable
 
-					console.log('GET company');
-					var companyTitle =  await driver.findElement(By.xpath("//div[@role='main' and @aria-label]"))//.get_attribute('aria-label')
-						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) {  console.log('error : '+err); });
+				console.log('GET company');
+				var companyTitle =  await driver.findElement(By.xpath("//div[@role='main' and @aria-label]"))//.get_attribute('aria-label')
+					.then(function(element) { return element.getAttribute('aria-label'); })
+					.catch( function(err) {  console.log('error : '+err); });
 
-					var phone =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Numéro de téléphone:')]"))//.getAttribute('aria-label');
-						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) {  console.log('error : '+err); });
-					var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
-						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) {  console.log('error : '+err); });
+				var phone =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Numéro de téléphone:')]"))//.getAttribute('aria-label');
+					.then(function(element) { return element.getAttribute('aria-label'); })
+					.catch( function(err) {  console.log('error : '+err); });
+				var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
+					.then(function(element) { return element.getAttribute('aria-label'); })
+					.catch( function(err) {  console.log('error : '+err); });
 
-					var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
-						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) {  console.log('error : '+err); });
-				//}
+				var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
+					.then(function(element) { return element.getAttribute('aria-label'); })
+					.catch( function(err) {  console.log('error : '+err); });
 
-				/*
-				if(website != null){
-					mail = await getEmailFromWebsite(website);
-				}
-				*/
-				mail = '0';
+				//FIND EMAIL
+				
+				try{
+					if(website != null && website != undefined){
+						website =	website.replace('Site Web: ','');
+						website =	website.replace(' ','');
+						mail = await getEmailFromWebsite('http://'+website);
+					}
+				}catch(err){}
+				
+				//mail = 'TODO: True email from website';
 
 				driver.sleep(1000);
 				//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
 
 				console.log('construct object');
-				// CONSTRUCT COMPANY OBJECT
+				// CONSTRUCT COMPANY OBJECT AND TRANSFORM DATA
 				let company = [];
 				if(companyTitle !== null){company.push(companyTitle);}
-				if(phone !== null){company.push(phone);}
-				if(website!== null){company.push(website);}
-				if(mail !== null){company.push(mail);}
-				if(adresse !== null ){company.push(adresse);}
+				if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
+				if(website !== null && website !== undefined){company.push(website);}
+				if(mail !== null && mail !== undefined){company.push(mail);}
+				if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
+				
 				if(company!== null && company.length > 0){
 					companies.push(company);
 					companyNumber++;
