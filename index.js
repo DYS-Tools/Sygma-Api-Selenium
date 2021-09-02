@@ -1,36 +1,41 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 const port = process.env.PORT || 3456;
 
 // options : https://stackoverflow.com/questions/63466426/handshake-failed-returned-1-ssl-error-code-1-net-error-201 
 
-webdriver = require('selenium-webdriver'),
-By = webdriver.By,
-until = webdriver.until,
-Builder = webdriver.Builder,
-Capabilities = webdriver.Capabilities,
-chrome = require('selenium-webdriver/chrome'),
-firefox = require('selenium-webdriver/firefox');
-var path = require('chromedriver').path;
+import 'selenium-webdriver';
+import webdriver from 'selenium-webdriver';
+//import By from 'selenium-webdriver';
+import until  from 'selenium-webdriver';
+import {Builder, By, }  from 'selenium-webdriver';
+import Capabilities from 'selenium-webdriver';
 
-//const caps = new Capabilities();
-//caps.setPageLoadStrategy("eager");
+import chrome from 'selenium-webdriver/chrome.js';
+//firefox = require('selenium-webdriver/firefox');
+import 'chromedriver';
 
+
+import getEmailFromWebsite from './utils/utils.js';
 
 async function getCompanies(url){
 		
 		let companyNumber = 0;
-		
-		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', /*'--headless', */ '--disable-dev-shm-usage', '--disable-gpu', '--disable-extensions',
+		let mail = '';
+
+		//.setPageLoadStrategy(PageLoadStrategy.NORMAL)   // pass to eager
+		let driver = chrome.Driver.createSession(new chrome.Options().addArguments(['--no-sandbox', /* '--headless', */  '--disable-dev-shm-usage', '--disable-gpu', '--disable-extensions',
 		'excludeSwitches', 'enable-logging', '--ignore-ssl-errors', '--ignore-certificate-error', '--start-maximized','--enable-automation', 
 		'--disable-blink-features=AutomationControlled', '--useAutomationExtension=False', '--disable-software-rasterizer', '--disable-web-security']), new 
-		chrome.ServiceBuilder(path).build());
+		chrome.ServiceBuilder().build());
+
 		//driver.manage().waitForPageToLoad(30000);
 		driver.manage().timeouts().implicitlyWait(50000000);
 		driver.manage().window().setSize(993, 745); // it's a size of the browser window with full screen and open developper tools in chrome
 
 		let companies = [];
 		await driver.get(url);
+		driver.sleep(1000);
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
 		driver.sleep(1700);
@@ -55,7 +60,7 @@ async function getCompanies(url){
 				driver.sleep(1900);
 				console.log('selection element');
 				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
-				driver.sleep(700);
+				driver.sleep(1400);
 
 
 				// GET ELEMENTS ON COMPANY PAGE
@@ -64,24 +69,30 @@ async function getCompanies(url){
 				let phone = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button/div[1]/div[2]/div[1]')).getAttribute('aria-label');
 				let website = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[3]/button')).getAttribute('aria-label');
 				let adresse = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[7]/div[1]/button/div[1]/div[2]/div[1]')).getText();
-				let mail = 'TODO: mail from website scraping'; // TODO: scrap function from website to get mail
+
+				/*
+				if(website != null){
+					mail = await getEmailFromWebsite(website);
+				}
+				*/
+				mail = '0';
 
 				driver.sleep(1000);
 				//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
 
 				console.log('construct object');
 				// CONSTRUCT COMPANY OBJECT
-				company = [];
+				let company = [];
 				if(companyTitle !== null){company.push(companyTitle);}
 				if(phone !== null){company.push(phone);}
 				if(website!== null){company.push(website);}
 				if(mail !== null){company.push(mail);}
 				if(adresse !== null ){company.push(adresse);}
-				if(company!== null ){
+				if(company!== null && company.length > 0){
 					companies.push(company);
 					companyNumber++;
 				}
-				console.log(company);
+				if(company !== null && company.length > 0){console.log(company);} else {console.log('company is null');}
 				console.log(companyNumber);
 				
 

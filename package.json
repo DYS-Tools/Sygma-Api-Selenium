@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
@@ -12,6 +13,7 @@
   "dependencies": {
     "chromedriver": "latest",
     "express": "^4.17.1",
+    "node-fetch": "^3.0.0",
     "selenium-webdriver": "3.6.0"
   }
 }
