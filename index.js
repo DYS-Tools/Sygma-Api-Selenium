@@ -46,101 +46,103 @@ async function getCompanies(url){
 			for (let currentCompany = 1; currentCompany < maxResultForPage * 2 ; currentCompany = currentCompany = currentCompany + 2) {
 				driver.sleep(1600);
 
-				// SCROLL 
-				console.log('scroll');
-				let scrollValue = 850;
-				//if(currentCompany > 5){ scrollValue = 1200;}
-				if(currentCompany > 7){ scrollValue = 1300;}
-				if(currentCompany > 9){scrollValue = 2000;}
-				if(currentCompany > 12){scrollValue = 2300;}
-				if(currentCompany > 18){scrollValue = 5500;}
-				driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
-				
-				// SELECT COMPANY IN LIST
-				driver.sleep(800);
-				console.log('selection element');
-				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
-				driver.sleep(2400);
-
-				// GET ELEMENTS ON COMPANY PAGE
-
-				console.log('GET company');
-				var companyTitle =  await driver.findElement(By.xpath("//div[@role='main' and @aria-label]"))//.get_attribute('aria-label')
-					.then(function(element) { return element.getAttribute('aria-label'); })
-					.catch( function(err) {  });
-
-				var phone =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Numéro de téléphone:')]"))//.getAttribute('aria-label');
-					.then(function(element) { return element.getAttribute('aria-label'); })
-					.catch( function(err) {  });
-				var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
-					.then(function(element) { return element.getAttribute('aria-label'); })
-					.catch( function(err) {  });
-
-				var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
-					.then(function(element) { return element.getAttribute('aria-label'); })
-					.catch( function(err) {  });
-
-				//FIND EMAIL
-				if(website !== null && website !== undefined){
-					website =	website.replace('Site Web: ','');
-					website =	website.replace(' ','');
-					console.log(website);
-					var mail = await getEmailFromWebsite('https://'+website);
-					console.log(mail);
-				}
-				
-				//mail = 'TODO: True email from website';
-
-				driver.sleep(2000);
-				//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
-
-				console.log('construct object');
-				// CONSTRUCT COMPANY OBJECT AND TRANSFORM DATA
-				let company = [];
-				if(companyTitle !== null){company.push(companyTitle);}
-				if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
-				if(website !== null && website !== undefined){company.push(website);}
-				if(mail !== null && mail !== undefined){company.push(mail);}
-				if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
-				
-				if(company!== null && company.length > 0){
-					companies.push(company);
-					companyNumber++;
-				}
-				if(company !== null && company.length > 0){console.log(company);} else {console.log('company is null');}
-				console.log(companyNumber);
-				
-
-				driver.sleep(800);
+				try{
+					// SCROLL 
+					console.log('scroll');
+					let scrollValue = 850;
+					//if(currentCompany > 5){ scrollValue = 1200;}
+					if(currentCompany > 7){ scrollValue = 1300;}
+					if(currentCompany > 9){scrollValue = 2000;}
+					if(currentCompany > 12){scrollValue = 2300;}
+					if(currentCompany > 18){scrollValue = 5500;}
+					driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
 					
-				//REMOVE MENU IF IT ENABLED
-				/*
-				if(await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[24]/div/div[2]/ul/jsl[3]/ul[1]/li[1]/button/label')).isDisplayed() == true ){
-					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[24]/div/div[2]/ul/div[2]/button')).click();
+					// SELECT COMPANY IN LIST
+					driver.sleep(800);
+					console.log('selection element');
+					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
+					driver.sleep(2400);
+
+					// GET ELEMENTS ON COMPANY PAGE
+
+					console.log('GET company');
+					var companyTitle =  await driver.findElement(By.xpath("//div[@role='main' and @aria-label]"))//.get_attribute('aria-label')
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  });
+
+					var phone =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Numéro de téléphone:')]"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  });
+					var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  });
+
+					var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
+						.then(function(element) { return element.getAttribute('aria-label'); })
+						.catch( function(err) {  });
+
+					//FIND EMAIL
+					if(website !== null && website !== undefined){
+						website =	website.replace('Site Web: ','');
+						website =	website.replace(' ','');
+						console.log(website);
+						var mail = await getEmailFromWebsite('https://'+website);
+						console.log(mail);
+					}
+					
+					//mail = 'TODO: True email from website';
+
+					driver.sleep(2000);
+					//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
+
+					console.log('construct object');
+					// CONSTRUCT COMPANY OBJECT AND TRANSFORM DATA
+					let company = [];
+					if(companyTitle !== null){company.push(companyTitle);}
+					if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
+					if(website !== null && website !== undefined){company.push(website);}
+					if(mail !== null && mail !== undefined){company.push(mail);}
+					if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
+					
+					if(company!== null && company.length > 0){
+						companies.push(company);
+						companyNumber++;
+					}
+					if(company !== null && company.length > 0){console.log(company);} else {console.log('company is null');}
+					console.log(companyNumber);
+					
+
+					driver.sleep(800);
+						
+					//REMOVE MENU IF IT ENABLED
+					/*
+					if(await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[24]/div/div[2]/ul/jsl[3]/ul[1]/li[1]/button/label')).isDisplayed() == true ){
+						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[24]/div/div[2]/ul/div[2]/button')).click();
+					}
+					*/
+
+					console.log('Navigation Back');
+					//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click(); // work
+					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button')).click();
+					driver.sleep(1200);
+
+					//RESULT HANDLER
+					if(companyNumber >= 25){
+						currentCompany = 100000;
+					}
+
+					//PAGE HANDLER
+					console.log('currentCompany var:' + currentCompany);
+					if(currentCompany >= 17 && currentCompany < 99999){
+						console.log('nextPAGE');
+						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]')).click(); // next page
+						driver.sleep(1300);
+						maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
+						currentCompany = 1;
+						driver.sleep(2500);
+					}
 				}
-				*/
-
-				console.log('Navigation Back');
-				//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click(); // work
-				await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button')).click();
-				driver.sleep(1200);
-
-				//RESULT HANDLER
-				if(companyNumber >= 25){
-					currentCompany = 100000;
-				}
-
-				//PAGE HANDLER
-				console.log('currentCompany var:' + currentCompany);
-				if(currentCompany >= 17 && currentCompany < 99999){
-					console.log('nextPAGE');
-					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]')).click(); // next page
-					driver.sleep(1300);
-					maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
-					currentCompany = 1;
-					driver.sleep(2500);
-				}
-
+				catch{}
 				
 			}
 		}
