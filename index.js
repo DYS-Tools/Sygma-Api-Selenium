@@ -18,6 +18,8 @@ import 'chromedriver';
 
 import getEmailFromWebsite from './utils/utils.js';
 
+import * as GMapsCoordinate from './assets/coordinate.js';
+
 async function getCompanies(url){
 		
 		let companyNumber = 0;
@@ -161,11 +163,20 @@ async function getCompanies(url){
 
 	  
 /* Find Company on google Maps */
-app.get('/getCompany/:searchWord', async (req, res) => {
+app.get('/getCompany/:searchWord/:wantedResult', async (req, res) => {
 
+	let companies = []
 	let searchWord = req.params.searchWord;
-	let url = 'https://www.google.fr/maps/search/'+searchWord+'/@49.6192493,0.257829,12z/'; //TODO: random position 
-	let companies = await getCompanies(url);
+	let wantedResult = req.params.wantedResult;
+	let numberNeedPosition = ( wantedResult / 25 ) + 1 ;
+
+	for(let i = 1;i<numberNeedPosition; i++){
+		// loop position 
+		const randomPosition = GMapsCoordinate[Math.floor(Math.random() * GMapsCoordinate.length)]; // find one random position from coordinate
+		let url = 'https://www.google.fr/maps/search/'+searchWord+'/'+randomPosition+'/'; 
+		let positioncompanies = await getCompanies(url); // [ company1 ; company2 ; company3 ]
+		companies.push(positioncompanies);
+	}
 
 	console.log(companies);
   
@@ -176,7 +187,7 @@ app.get('/getCompany/:searchWord', async (req, res) => {
 app.get('/', (req, res) => {
   
     res.set('Content-Type', 'text/html');
-    res.send('API on /getCompany/:searchWord (searching in google maps)');
+    res.send('API on /getCompany/:searchWord/:wantedResultNumber (searching in google maps)');
 });
 
 app.listen(port, () => {
