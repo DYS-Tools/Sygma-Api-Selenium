@@ -115,6 +115,7 @@ async function getCompanies(url){
 
 					driver.sleep(800);
 						
+					//TODO: MENU HANDLER
 					//REMOVE MENU IF IT ENABLED
 					/*
 					if(await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[24]/div/div[2]/ul/jsl[3]/ul[1]/li[1]/button/label')).isDisplayed() == true ){
@@ -123,8 +124,9 @@ async function getCompanies(url){
 					*/
 
 					console.log('Navigation Back');
-					//await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click(); // work
+					//	await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click(); // work
 					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button')).click();
+
 					driver.sleep(1200);
 
 					//RESULT HANDLER
@@ -165,7 +167,7 @@ async function getCompanies(url){
 /* Find Company on google Maps */
 app.get('/getCompany/:searchWord/:wantedResult', async (req, res) => {
 
-	let companies = []
+	let companies = [];
 	let searchWord = req.params.searchWord;
 	let wantedResult = req.params.wantedResult;
 	let numberNeedPosition = ( wantedResult / 25 ) + 1 ;
