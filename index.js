@@ -82,10 +82,11 @@ async function getCompanies(url){
 						.catch( function(err) {  });
 
 					//FIND EMAIL
+					var mail = '';
 					if(website !== null){
 						website =	website.replace('Site Web: ','');
 						website =	website.replace(' ','');
-						var mail = await getEmailFromWebsite('https://' + website);
+						mail = await getEmailFromWebsite('https://' + website);
 							//.then(function(element) { return element; })
 							//.catch( function(err) { return err; });
 						//console.log(mail);
@@ -99,7 +100,7 @@ async function getCompanies(url){
 					if(companyTitle !== null){company.push(companyTitle);}
 					if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
 					if(website !== null && website !== undefined){company.push(website);}
-					if(mail !== null ){ company.push(mail); }
+					if(mail !== null ){ company.push(mail[0]); }
 					if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
 					
 					if(company!== null && company.length > 0){
