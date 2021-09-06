@@ -75,25 +75,23 @@ async function getCompanies(url){
 						.catch( function(err) {  });
 					var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
 						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) {  });
+						.catch( function(err) { return err; });
 
 					var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
 						.then(function(element) { return element.getAttribute('aria-label'); })
 						.catch( function(err) {  });
 
 					//FIND EMAIL
-					if(website !== null && website !== undefined){
+					if(website !== null){
 						website =	website.replace('Site Web: ','');
 						website =	website.replace(' ','');
-						console.log(website);
-						var mail = await getEmailFromWebsite('https://'+website);
+						var mail = await getEmailFromWebsite('https://' + website)
+							.then(function(element) { return element; })
+							.catch( function(err) { return err; });
 						console.log(mail);
 					}
+					driver.sleep(3000);
 					
-					//mail = 'TODO: True email from website';
-
-					driver.sleep(2000);
-					//List elementsList = driver.findElements(By.xpath("//[contains(text(),'Selenium')]"));
 
 					console.log('construct object');
 					// CONSTRUCT COMPANY OBJECT AND TRANSFORM DATA
@@ -101,7 +99,7 @@ async function getCompanies(url){
 					if(companyTitle !== null){company.push(companyTitle);}
 					if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
 					if(website !== null && website !== undefined){company.push(website);}
-					if(mail !== null && mail !== undefined){company.push(mail);}
+					if(mail !== null){ company.push(mail); }
 					if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
 					
 					if(company!== null && company.length > 0){
@@ -127,7 +125,7 @@ async function getCompanies(url){
 					driver.sleep(1200);
 
 					//RESULT HANDLER
-					if(companyNumber >= 25){
+					if(companyNumber >= 9){ // 25 default
 						currentCompany = 100000;
 					}
 
@@ -165,7 +163,7 @@ async function getCompanies(url){
 app.get('/getCompany/:searchWord', async (req, res) => {
 
 	let searchWord = req.params.searchWord;
-	let url = 'https://www.google.fr/maps/search/'+searchWord+'/@49.6192493,0.257829,12z/';
+	let url = 'https://www.google.fr/maps/search/'+searchWord+'/@49.6192493,0.257829,12z/'; //TODO: random position 
 	let companies = await getCompanies(url);
 
 	console.log(companies);
@@ -173,8 +171,6 @@ app.get('/getCompany/:searchWord', async (req, res) => {
   res.set('Content-Type', 'text/html');
   return res.send(companies);
 });
-
-
 
 app.get('/', (req, res) => {
   

@@ -4,25 +4,31 @@ import fetch from "node-fetch";
   let emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[/fr|com|org|net|us|info/]+)/;
   let emailRegex2 = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-  try{
-    return await fetch(url)
-      .then( res => { 
-        let htmlPage = res.text();     // res.text work ! 
+  return await fetch(url)
+    .then( async res => { 
+       await res.text()   // res.text work ! 
+        .then( function (text) {
+            console.log('render text from website');
+            //console.log(text);
+            return 'email here';
+            //myArticle.innerHTML = text;
+            var mail = emailRegex.exec(text);
+            if(mail === null || mail === undefined){
+              mail = text.match(emailRegex);
+            }
+            if(mail === null || mail === undefined){
+              mail = text.match(emailRegex);
+            }
 
-        // scraping email logic is good
-        console.log('scraping email in url...');
-        var mail = emailRegex2.exec(htmlPage);
-        if(mail){return mail[0]}
-        var mail = htmlPage.toString().match(emailRegex);
-        if(mail){return mail[0]}
-        var mail = htmlPage.toString().match(emailRegex2);
-        if(mail){return mail[0]}
-        return 'no email';
-      })
-      
-  }
-  catch{ return; }
-  
-    
+            if(mail === null || mail === undefined){
+              mail = 'no email';
+            }
+            
+            return mail ;
+          })
+
+      //htmlPage = htmlPage.replace('', ' ');
+      //htmlPage = htmlPage.replace('\t', ' ');
+  })
 };
 
