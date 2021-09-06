@@ -6,25 +6,31 @@ import fetch from "node-fetch";
 
   return await fetch(url)
     .then( async res => { 
-       await res.text()   // res.text work ! 
-        .then( function (text) {
+       return await res.text()   // res.text work ! 
+        .then(  function  (text)  {
             console.log('render text from website');
             //console.log(text);
-            return 'email here';
+            //return 'email here';
             //myArticle.innerHTML = text;
-            var mail = emailRegex.exec(text);
-            if(mail === null || mail === undefined){
-              mail = text.match(emailRegex);
+            return emailRegex.exec(text);
+
+            /*
+            if(mail.length > 0) {
+              return mail;
             }
-            if(mail === null || mail === undefined){
-              mail = text.match(emailRegex);
+
+            if(mail === null || mail === undefined || mail.length == 0){
+              return text.match(emailRegex);
+            }
+            if(mail === null || mail === undefined || mail.length == 0){
+              return text.match(emailRegex2);
             }
 
             if(mail === null || mail === undefined){
-              mail = 'no email';
+              return '';
             }
-            
-            return mail ;
+            */
+  
           })
 
       //htmlPage = htmlPage.replace('', ' ');

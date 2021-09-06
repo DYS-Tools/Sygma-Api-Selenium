@@ -85,10 +85,10 @@ async function getCompanies(url){
 					if(website !== null){
 						website =	website.replace('Site Web: ','');
 						website =	website.replace(' ','');
-						var mail = await getEmailFromWebsite('https://' + website)
-							.then(function(element) { return element; })
-							.catch( function(err) { return err; });
-						console.log(mail);
+						var mail = await getEmailFromWebsite('https://' + website);
+							//.then(function(element) { return element; })
+							//.catch( function(err) { return err; });
+						//console.log(mail);
 					}
 					driver.sleep(3000);
 					
@@ -99,7 +99,7 @@ async function getCompanies(url){
 					if(companyTitle !== null){company.push(companyTitle);}
 					if(phone !== null && phone !== undefined ){company.push(phone.replace('Numéro de téléphone: ','')  );}
 					if(website !== null && website !== undefined){company.push(website);}
-					if(mail !== null){ company.push(mail); }
+					if(mail !== null ){ company.push(mail); }
 					if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
 					
 					if(company!== null && company.length > 0){
@@ -125,7 +125,7 @@ async function getCompanies(url){
 					driver.sleep(1200);
 
 					//RESULT HANDLER
-					if(companyNumber >= 9){ // 25 default
+					if(companyNumber >= 25){ // 25 default
 						currentCompany = 100000;
 					}
 
