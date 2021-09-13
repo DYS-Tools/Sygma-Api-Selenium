@@ -18,7 +18,7 @@ import 'chromedriver';
 
 import getEmailFromWebsite from './utils/utils.js';
 
-import * as GMapsCoordinate from './assets/coordinate.js';
+import {GMapsCoordinate} from './assets/coordinate.js';
 
 async function getCompanies(url){
 		
@@ -41,7 +41,7 @@ async function getCompanies(url){
 		await driver.findElement(By.xpath('/html/body/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button/span')).click(); // pass RGPD page
 
 		driver.sleep(3800);
-		let maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
+		let maxResultForPage = 20 ; //await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
 		console.log(maxResultForPage);
 
 		if(Number(maxResultForPage) > 0){
@@ -57,12 +57,13 @@ async function getCompanies(url){
 					if(currentCompany > 9){scrollValue = 2000;}
 					if(currentCompany > 12){scrollValue = 2300;}
 					if(currentCompany > 18){scrollValue = 5500;}
-					driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
+					//driver.executeScript("var el = document.evaluate('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; el.scroll(0, "+scrollValue+");");
 					
 					// SELECT COMPANY IN LIST
+
 					driver.sleep(800);
 					console.log('selection element');
-					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
+					await driver.findElement(By.xpath('/html/body/div[3]/div[9]/div[8]/div/div[1]/div/div/div[4]/div[1]/div['+currentCompany+']/div/a')).click(); // select company
 					driver.sleep(2400);
 
 					// GET ELEMENTS ON COMPANY PAGE
@@ -77,14 +78,15 @@ async function getCompanies(url){
 						.catch( function(err) {  });
 					var website =  await driver.findElement(By.xpath("//button[contains(@aria-label, 'Site Web:')]"))//.getAttribute('aria-label');
 						.then(function(element) { return element.getAttribute('aria-label'); })
-						.catch( function(err) { return err; });
+						.catch( function(err) { });
 
 					var adresse =  await driver.findElement(By.xpath("//button[@data-item-id='address']"))//.getAttribute('aria-label');
 						.then(function(element) { return element.getAttribute('aria-label'); })
 						.catch( function(err) {  });
 
 					//FIND EMAIL
-					var mail = '';
+					var mail = '0';
+					/*
 					if(website !== null){
 						website =	website.replace('Site Web: ','');
 						website =	website.replace(' ','');
@@ -93,6 +95,7 @@ async function getCompanies(url){
 							//.catch( function(err) { return err; });
 						//console.log(mail);
 					}
+					*/
 					driver.sleep(3000);
 					
 
@@ -105,12 +108,15 @@ async function getCompanies(url){
 					if(mail !== null ){ company.push(mail[0]); }
 					if(adresse !== null && adresse !== undefined ){company.push(adresse.replace('Adresse: ','')  );}
 					
-					if(company!== null && company.length > 0){
+					if(company!== null && company.length > 0 && companyTitle !== null){
 						companies.push(company);
 						companyNumber++;
+						console.log(companyNumber);
 					}
-					if(company !== null && company.length > 0){console.log(company);} else {console.log('company is null');}
-					console.log(companyNumber);
+					else{
+						console.log('company have bad informations');
+					}
+					
 					
 
 					driver.sleep(800);
@@ -125,9 +131,9 @@ async function getCompanies(url){
 
 					console.log('Navigation Back');
 					//	await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[1]/button')).click(); // work
-					await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button')).click();
+					await driver.findElement(By.xpath('/html/body/div[3]/div[9]/div[3]/div[1]/div[1]/div[1]/div[4]/div/div[1]/div/div/button/span')).click();
 
-					driver.sleep(1200);
+					driver.sleep(1700);
 
 					//RESULT HANDLER
 					if(companyNumber >= 25){ // 25 default
@@ -140,7 +146,7 @@ async function getCompanies(url){
 						console.log('nextPAGE');
 						await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/div/button[2]')).click(); // next page
 						driver.sleep(1300);
-						maxResultForPage = await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
+						maxResultForPage = 20; //await driver.findElement(By.xpath('/html/body/jsl/div[3]/div[10]/div[8]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')).getText();
 						currentCompany = 1;
 						driver.sleep(2500);
 					}
@@ -167,23 +173,23 @@ async function getCompanies(url){
 /* Find Company on google Maps */
 app.get('/getCompany/:searchWord/:wantedResult', async (req, res) => {
 
-	let companies = [];
+	let Totalcompanies = [];
 	let searchWord = req.params.searchWord;
 	let wantedResult = req.params.wantedResult;
-	let numberNeedPosition = ( wantedResult / 25 ) + 1 ;
+	let numberNeedPosition = ( wantedResult / 7 ) + 1 ; // exact number : 25 // reality : 7  ( one position find 7 results on average )
 
 	for(let i = 1;i<numberNeedPosition; i++){
 		// loop position 
 		const randomPosition = GMapsCoordinate[Math.floor(Math.random() * GMapsCoordinate.length)]; // find one random position from coordinate
 		let url = 'https://www.google.fr/maps/search/'+searchWord+'/'+randomPosition+'/'; 
 		let positioncompanies = await getCompanies(url); // [ company1 ; company2 ; company3 ]
-		companies.push(positioncompanies);
+		Totalcompanies.push(positioncompanies);
 	}
 
-	console.log(companies);
+	//console.log(Totalcompanies);
   
   res.set('Content-Type', 'text/html');
-  return res.send(companies);
+  return res.send(Totalcompanies);
 });
 
 app.get('/', (req, res) => {
